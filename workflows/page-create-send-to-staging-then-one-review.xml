@@ -1,0 +1,110 @@
+<system-workflow-definition initial-step="publish-to-staging" >
+	<triggers>
+		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
+		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />
+		<trigger name="com.cms.workflow.function.AssignToSpecifiedGroup" class="com.cms.workflow.function.AssignToSpecifiedGroup" />
+		<trigger name="assignToWorkflowOwner" class="com.cms.workflow.function.AssignToWorkflowOwner" />
+		<trigger name="com.cms.workflow.function.CopyFolder" class="com.cms.workflow.function.CopyFolder" />
+		<trigger name="com.cms.workflow.function.CreateNewWorkflowTrigger" class="com.cms.workflow.function.CreateNewWorkflowTrigger" />
+		<trigger name="com.cms.workflow.function.Delete" class="com.cms.workflow.function.Delete" />
+		<trigger name="com.cms.workflow.function.DeleteAndUnpublish" class="com.cms.workflow.function.DeleteAndUnpublish" />
+		<trigger name="com.cms.workflow.function.DeleteParentFolderTrigger" class="com.cms.workflow.function.DeleteParentFolderTrigger" />
+		<trigger name="email" class="com.cms.workflow.function.EmailProvider" />
+		<trigger name="merge" class="com.cms.workflow.function.Merge" />
+		<trigger name="preserveCurrentUser" class="com.cms.workflow.function.PreserveCurrentUser" />
+		<trigger name="com.cms.workflow.function.PublishContainingPublishSetTrigger" class="com.cms.workflow.function.PublishContainingPublishSetTrigger" />
+		<trigger name="com.cms.workflow.function.PublishParentFolderTrigger" class="com.cms.workflow.function.PublishParentFolderTrigger" />
+		<trigger name="com.cms.workflow.function.PublishSetTrigger" class="com.cms.workflow.function.PublishSetTrigger" />
+		<trigger name="publish" class="com.cms.workflow.function.Publisher" />
+		<trigger name="version" class="com.cms.workflow.function.Version" />
+	</triggers>
+	<steps>
+		<step type="system" identifier="publish-to-staging" label="Publish to Staging" >
+			<actions>
+				<action identifier="publishing-to-staging" label="Publishing to Staging" move="forward" >
+					<trigger name="publish" >
+						<parameter>
+							<name>destination</name>
+							<value>staging.sandiego.edu</value>
+						</parameter>
+						<parameter>
+							<name>publish-working-copy</name>
+							<value>true</value>
+						</parameter>
+						<parameter>
+							<name>authorizing-type</name>
+							<value>system</value>
+						</parameter>
+					</trigger>
+					<trigger name="assignToWorkflowOwner" />
+				</action>
+			</actions>
+		</step>
+		<step type="transition" identifier="edit-or-send-to-review" label="Make Modifications or Send to Review" default-group="developers" >
+			<actions>
+				<action identifier="user-make-more-changes" label="Make Additional Changes" next-id="user-to-revise-content" >
+					<trigger name="assignToWorkflowOwner" />
+				</action>
+				<action identifier="send-to-review" label="Send to Review" next-id="technical-review" >
+					<trigger name="email" >
+						<parameter>
+							<name>mode</name>
+							<value>notify</value>
+						</parameter>
+					</trigger>
+				</action>
+			</actions>
+		</step>
+		<step type="transition" identifier="technical-review" label="Technical Review" default-group="developers" >
+			<actions>
+				<action identifier="assigning-modifications" label="Assign Additional Modifications" next-id="user-to-revise-content" >
+					<trigger name="assignToWorkflowOwner" />
+					<trigger name="email" >
+						<parameter>
+							<name>mode</name>
+							<value>notify</value>
+						</parameter>
+					</trigger>
+				</action>
+				<action identifier="approve" label="Approve" move="forward" />
+				<action identifier="edit-by-developer" label="Edit" next-id="developer-to-revise-content" >
+					<trigger name="preserveCurrentUser" />
+				</action>
+			</actions>
+		</step>
+		<step type="system" identifier="publish" label="Publish" >
+			<actions>
+				<action identifier="publishing" label="Publishing" move="forward" >
+					<trigger name="merge" />
+					<trigger name="publish" >
+						<parameter>
+							<name>authorizing-type</name>
+							<value>system</value>
+						</parameter>
+					</trigger>
+					<trigger name="email" >
+						<parameter>
+							<name>mode</name>
+							<value>completed</value>
+						</parameter>
+					</trigger>
+				</action>
+			</actions>
+		</step>
+		<step type="system" identifier="complete" label="Complete" />
+	</steps>
+	<non-ordered-steps>
+		<step type="edit" identifier="developer-to-revise-content" label="Developer Revising Content" default-group="developers" >
+			<actions>
+				<action identifier="edit-then-publish" label="Edit then Publish" next-id="publish" />
+			</actions>
+		</step>
+		<step type="edit" identifier="user-to-revise-content" label="User Revising Content" default-group="developers" >
+			<actions>
+				<action identifier="edit-and-send-back" label="Edit and Publish to Staging" next-id="publish-to-staging" >
+					<trigger name="assignToWorkflowOwner" />
+				</action>
+			</actions>
+		</step>
+	</non-ordered-steps>
+</system-workflow-definition>

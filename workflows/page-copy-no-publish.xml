@@ -1,0 +1,32 @@
+<system-workflow-definition name="Copy" initial-step="copy-page" >
+	<triggers>
+		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
+		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />
+		<trigger name="com.cms.workflow.function.AssignToSpecifiedGroup" class="com.cms.workflow.function.AssignToSpecifiedGroup" />
+		<trigger name="com.cms.workflow.function.AssignToWorkflowOwner" class="com.cms.workflow.function.AssignToWorkflowOwner" />
+		<trigger name="com.cms.workflow.function.CopyFolder" class="com.cms.workflow.function.CopyFolder" />
+		<trigger name="com.cms.workflow.function.CreateNewWorkflowTrigger" class="com.cms.workflow.function.CreateNewWorkflowTrigger" />
+		<trigger name="com.cms.workflow.function.Delete" class="com.cms.workflow.function.Delete" />
+		<trigger name="com.cms.workflow.function.DeleteAndUnpublish" class="com.cms.workflow.function.DeleteAndUnpublish" />
+		<trigger name="com.cms.workflow.function.DeleteParentFolderTrigger" class="com.cms.workflow.function.DeleteParentFolderTrigger" />
+		<trigger name="email" class="com.cms.workflow.function.EmailProvider" />
+		<trigger name="merge" class="com.cms.workflow.function.Merge" />
+		<trigger name="com.cms.workflow.function.PreserveCurrentUser" class="com.cms.workflow.function.PreserveCurrentUser" />
+		<trigger name="com.cms.workflow.function.PublishContainingPublishSetTrigger" class="com.cms.workflow.function.PublishContainingPublishSetTrigger" />
+		<trigger name="com.cms.workflow.function.PublishParentFolderTrigger" class="com.cms.workflow.function.PublishParentFolderTrigger" />
+		<trigger name="com.cms.workflow.function.PublishSetTrigger" class="com.cms.workflow.function.PublishSetTrigger" />
+		<trigger name="publish" class="com.cms.workflow.function.Publisher" />
+		<trigger name="com.cms.workflow.function.Version" class="com.cms.workflow.function.Version" />
+	</triggers>
+	<steps>
+		<step type="system" identifier="copy-page" label="Copy Page" >
+			<actions>
+				<action identifier="copying-page" label="Copying Page" move="forward" >
+					<trigger name="merge" />
+				</action>
+			</actions>
+		</step>
+		<step type="system" identifier="complete" label="Complete" />
+	</steps>
+	<non-ordered-steps/>
+</system-workflow-definition>
