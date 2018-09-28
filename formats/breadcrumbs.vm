@@ -1,0 +1,107 @@
+## find out if this page is a landing page
+#set ($page = $_XPathTool.selectSingleNode($contentRoot, "//system-page[@current]" ))
+#set ($template2015 = $_XPathTool.selectSingleNode($page, "system-data-structure/template-2015" ))
+#set ($site_folder = $_XPathTool.selectSingleNode($contentRoot, '/system-index-block/system-folder'))
+#set ($is_landing_page = $template2015.getChild("is-landing-page").value)
+
+## we only want to display breadcrumbs if the page is not a landing page
+#if ($is_landing_page == 'No')
+    ## gather all items for breadcrumb trail
+    #set ($trail = $_XPathTool.selectNodes($contentRoot, "//system-folder"))
+
+    ## pull the site
+    #set ($site = $site_folder.getChild("site").value)
+
+    ## set the home icon
+    #set ($home = '<span class="icon icon-home22" aria-label="home"><span class="show-for-sr">Home</span></span>')
+
+    ## if the site is in dev, remove the zdev_ so it doesn't get included in the path of the breadcrumbs
+    #if($site.contains("_"))
+        #set ($sitearray = [])
+        #set ($sitearray = $site.split("_")) ## split site so that zdev_ is in one position and directory is in the other
+    #end
+
+    #if($site.contains("admissions_undergraduate"))
+        #set ($site = '/admissions/'+$sitearray.get(1)) ## only use the directory in the path
+    #elseif ($site.contains("admissions_graduate"))
+        #set ($site = '/admissions/'+$sitearray.get(1)) ## only use the directory in the path
+    #elseif ($site == "cas")
+        #set ($site = '/'+$site)
+        #set ($home = '<span class="icon icon-home22" aria-label="home"><span class="show-for-sr">Home</span></span> College of Arts and Sciences') ## change home icon to include text
+    #elseif ($site == "peace")
+        #set ($site = '/'+$site)
+        #set ($home = '<span class="icon icon-home22" aria-label="home"><span class="show-for-sr">Home</span></span> School of Peace Studies') ## change home icon to include text
+    #elseif($site.contains("_"))
+        #set ($site = '/'+$sitearray.get(1)) ## only use the directory in the path
+    #else
+        #set ($site = '/'+$site)
+    #end
+
+    ## Fix for Breadcrumbs on irp-internal
+    #if($site.contains("irp-internal"))
+        #set ($site = "/irp")
+    #end
+    #if($site.contains("main") || $site.contains("news-center"))
+        #set ($site = 'http://www.sandiego.edu')
+    #end
+
+    ## separating character between each breadcrumb (xml equivalent)
+    #set ($sep = ' &gt; ')
+
+    <div class="row" id="breadcrumbs-row">
+        <div class="columns">
+            <p class="breadcrumb">
+                ## loop through trail
+                #foreach ($crumb in $trail)
+                    ## pull link and path
+                    #set ($link = $crumb.getChild("link").value)
+                    #set ($path = $crumb.getChild("path").value)
+                    #set ($title = $_SerializerTool.serialize($crumb.getChild("title"),true))
+
+
+                    ## current attribute check
+                    #if ($crumb.getAttribute("current"))
+                        #if ( $crumb.getName() == "system-folder" )
+                            #set ( $page = $_XPathTool.selectSingleNode($crumb, "system-page[name='index'] | system-file[name='index.php']"))
+
+                            #if ($_XPathTool.selectSingleNode($crumb, "system-page/name").value == "index") ## it's the landing page of a folder
+                                #if ($path == "//" || $path == "") ## it's the site home page
+                                    ## do nothing, we're on the site landing page, show no breadcrumbs
+                                #else
+                                    <span class="current"><system-page-title /></span>
+                                    #break
+                                #end
+                            #else
+                                #if ($path == "//" || $path == "") ## it's the site home page
+                                    <a href="${site}/">$home</a> $sep
+                                #else
+                                    <a href="${site}${path}/index.php">$title</a> $sep
+                                #end
+                                <span class="current"><system-page-title /></span>
+                                #break
+                            #end
+                        #else
+                            #if ($_XPathTool.selectSingleNode($crumb, "system-page/name").value == "index") ## it's the landing page of a folder
+                                <system-page-title />
+                            #elseif ($path == "//" || $path == "") ## it's the site home page
+                                <a href="${site}/">$home</a> $sep
+                                <span class="current"><system-page-title /></span>
+                            #else
+                                <a href="${link}/index">$title</a> $sep
+                                <span class="current"><system-page-title /></span>
+                            #end
+                        #end
+
+                    #else ## a folder leading to the crumb
+
+                        #if ($path == "//" || $path == "") ## it's the site home page
+                            <a href="${site}/">$home</a> $sep
+                        #else
+                            <a href="${site}${path}/index.php">$title</a> $sep
+                        #end
+                    #end
+                #end
+            </p>
+        </div>
+    </div>
+#end

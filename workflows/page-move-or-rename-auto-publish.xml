@@ -1,4 +1,4 @@
-<system-workflow-definition initial-step="edit" >
+<system-workflow-definition initial-step="move-rename-page" >
 	<triggers>
 		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
 		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />
