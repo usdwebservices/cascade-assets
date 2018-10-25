@@ -86,9 +86,11 @@
                             #elseif ($path == "//" || $path == "") ## it's the site home page
                                 <a href="${site}/">$home</a> $sep
                                 <span class="current"><system-page-title /></span>
+                                #break
                             #else
                                 <a href="${link}/index">$title</a> $sep
                                 <span class="current"><system-page-title /></span>
+                                #break
                             #end
                         #end
 

@@ -16,7 +16,7 @@
 		<trigger name="com.cms.workflow.function.PublishParentFolderTrigger" class="com.cms.workflow.function.PublishParentFolderTrigger" />
 		<trigger name="com.cms.workflow.function.PublishSetTrigger" class="com.cms.workflow.function.PublishSetTrigger" />
 		<trigger name="publish" class="com.cms.workflow.function.Publisher" />
-		<trigger name="com.cms.workflow.function.Version" class="com.cms.workflow.function.Version" />
+		<trigger name="version" class="com.cms.workflow.function.Version" />
 	</triggers>
 	<steps>
 		<step type="system" identifier="create" label="Create" >
@@ -51,7 +51,7 @@
 		<step type="system" identifier="publish" label="Publish" >
 			<actions>
 				<action identifier="publishing" label="Publishing" move="forward" >
-					<trigger name="com.cms.workflow.function.Version" />
+					<trigger name="version" />
 					<trigger name="merge" />
 					<trigger name="publish" >
 						<parameter>
@@ -63,7 +63,6 @@
 							<value>_admin</value>
 						</parameter>
 					</trigger>
-					<trigger name="com.cms.workflow.function.Version" />
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
