@@ -66,10 +66,10 @@
 						</parameter>
 					</trigger>
 				</action>
-				<action identifier="approve" label="Approve" move="forward" />
 				<action identifier="edit-by-developer" label="Edit" next-id="developer-to-revise-content" >
 					<trigger name="preserveCurrentUser" />
 				</action>
+				<action identifier="approve" label="Approve" move="forward" />
 			</actions>
 		</step>
 		<step type="system" identifier="publish" label="Publish" >

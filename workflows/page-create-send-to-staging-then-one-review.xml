@@ -1,4 +1,4 @@
-<system-workflow-definition initial-step="publish-to-staging" >
+<system-workflow-definition initial-step="edit" >
 	<triggers>
 		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
 		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />
@@ -19,33 +19,9 @@
 		<trigger name="version" class="com.cms.workflow.function.Version" />
 	</triggers>
 	<steps>
-		<step type="system" identifier="publish-to-staging" label="Publish to Staging" >
+		<step type="system" identifier="edit" label="Edit" >
 			<actions>
-				<action identifier="publishing-to-staging" label="Publishing to Staging" move="forward" >
-					<trigger name="publish" >
-						<parameter>
-							<name>destination</name>
-							<value>staging.sandiego.edu</value>
-						</parameter>
-						<parameter>
-							<name>publish-working-copy</name>
-							<value>true</value>
-						</parameter>
-						<parameter>
-							<name>authorizing-type</name>
-							<value>system</value>
-						</parameter>
-					</trigger>
-					<trigger name="assignToWorkflowOwner" />
-				</action>
-			</actions>
-		</step>
-		<step type="transition" identifier="edit-or-send-to-review" label="Make Modifications or Send to Review" default-group="developers" >
-			<actions>
-				<action identifier="user-make-more-changes" label="Make Additional Changes" next-id="user-to-revise-content" >
-					<trigger name="assignToWorkflowOwner" />
-				</action>
-				<action identifier="send-to-review" label="Send to Review" next-id="technical-review" >
+				<action identifier="editing" label="Editing" move="forward" >
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
@@ -75,6 +51,7 @@
 		<step type="system" identifier="publish" label="Publish" >
 			<actions>
 				<action identifier="publishing" label="Publishing" move="forward" >
+					<trigger name="version" />
 					<trigger name="merge" />
 					<trigger name="publish" >
 						<parameter>
@@ -94,14 +71,14 @@
 		<step type="system" identifier="complete" label="Complete" />
 	</steps>
 	<non-ordered-steps>
-		<step type="edit" identifier="developer-to-revise-content" label="Developer Revising Content" default-group="developers" >
+		<step type="edit" identifier="developer-to-revise-content" label="Developer to Revise Content" default-group="developers" >
 			<actions>
 				<action identifier="edit-then-publish" label="Edit then Publish" next-id="publish" />
 			</actions>
 		</step>
-		<step type="edit" identifier="user-to-revise-content" label="User Revising Content" default-group="developers" >
+		<step type="edit" identifier="user-to-revise-content" label="User to Revise Content" default-group="developers" >
 			<actions>
-				<action identifier="edit-and-send-back" label="Edit and Publish to Staging" next-id="publish-to-staging" >
+				<action identifier="edit-and-send-back" label="Edit and Send Back for Review" next-id="edit" >
 					<trigger name="assignToWorkflowOwner" />
 				</action>
 			</actions>

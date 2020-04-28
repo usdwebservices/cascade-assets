@@ -1,4 +1,4 @@
-<system-workflow-definition name="Edit" initial-step="edit" >
+<system-workflow-definition initial-step="edit" >
 	<triggers>
 		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
 		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />
@@ -16,7 +16,7 @@
 		<trigger name="com.cms.workflow.function.PublishParentFolderTrigger" class="com.cms.workflow.function.PublishParentFolderTrigger" />
 		<trigger name="com.cms.workflow.function.PublishSetTrigger" class="com.cms.workflow.function.PublishSetTrigger" />
 		<trigger name="publish" class="com.cms.workflow.function.Publisher" />
-		<trigger name="version" class="com.cms.workflow.function.Version" />
+		<trigger name="com.cms.workflow.function.Version" class="com.cms.workflow.function.Version" />
 	</triggers>
 	<steps>
 		<step type="system" identifier="edit" label="Edit" >
@@ -34,7 +34,7 @@
 		<step type="system" identifier="version" label="Merge and Version" >
 			<actions>
 				<action identifier="versioning" label="Versioning" move="forward" >
-					<trigger name="version" />
+					<trigger name="com.cms.workflow.function.Version" />
 					<trigger name="merge" />
 					<trigger name="email" >
 						<parameter>
@@ -42,7 +42,6 @@
 							<value>completed</value>
 						</parameter>
 					</trigger>
-					<trigger name="com.cms.workflow.function.Version" />
 				</action>
 			</actions>
 		</step>

@@ -36,7 +36,7 @@
 							<value>system</value>
 						</parameter>
 					</trigger>
-					<trigger name="AssignToWorkflowOwner"/>
+					<trigger name="AssignToWorkflowOwner" />
 				</action>
 			</actions>
 		</step>
@@ -55,6 +55,25 @@
 		</step>
 		<step type="transition" identifier="content-review" label="Content Review" default-group="-app" >
 			<actions>
+				<action identifier="approver-editing" label="Edit" next-id="approver-to-revise-content" >
+					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
+				</action>
+				<action identifier="approver-assigning-modifications" label="Assign Additional Modifications" next-id="user-to-revise-content" >
+					<trigger name="email" >
+						<parameter>
+							<name>mode</name>
+							<value>notify</value>
+						</parameter>
+					</trigger>
+				</action>
+				<action identifier="approver-approving" label="Approve" move="forward" >
+					<trigger name="email" >
+						<parameter>
+							<name>mode</name>
+							<value>notify</value>
+						</parameter>
+					</trigger>
+				</action>
 				<action identifier="approver-publishing-to-staging" label="Approver Publishing to Staging" next-id="technical-review" >
 					<trigger name="publish" >
 						<parameter>
@@ -72,32 +91,10 @@
 					</trigger>
 					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
 				</action>
-				<action identifier="approver-approving" label="Approve" move="forward" >
-					<trigger name="email" >
-						<parameter>
-							<name>mode</name>
-							<value>notify</value>
-						</parameter>
-					</trigger>
-				</action>
-				<action identifier="approver-assigning-modifications" label="Assign Additional Modifications" next-id="user-to-revise-content" >
-					<trigger name="email" >
-						<parameter>
-							<name>mode</name>
-							<value>notify</value>
-						</parameter>
-					</trigger>
-				</action>
-				<action identifier="approver-editing" label="Edit" next-id="approver-to-revise-content" >
-					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
-				</action>
 			</actions>
 		</step>
 		<step type="transition" identifier="technical-review" label="Technical Review" default-group="developers" >
 			<actions>
-				<action identifier="tech-reviewer-editing" label="Edit" next-id="tech-to-revise-content" >
-					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
-				</action>
 				<action identifier="tech-reviewer-assigning-modifications" label="Assign Additional Modifications" next-id="user-to-revise-content" >
 					<trigger name="email" >
 						<parameter>
@@ -105,6 +102,9 @@
 							<value>notify</value>
 						</parameter>
 					</trigger>
+				</action>
+				<action identifier="tech-reviewer-editing" label="Edit" next-id="tech-to-revise-content" >
+					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
 				</action>
 				<action identifier="tech-reviewer-approving" label="Approve" move="forward" />
 			</actions>
@@ -137,11 +137,6 @@
 		<step type="system" identifier="complete" label="Complete" />
 	</steps>
 	<non-ordered-steps>
-		<step type="edit" identifier="tech-to-revise-content" label="Technical Reviewer to Revise Content" default-group="developers" >
-			<actions>
-				<action identifier="tech-reviewer-editing-then-publishing" label="Edit then Publish" next-id="publish" />
-			</actions>
-		</step>
 		<step type="edit" identifier="user-to-revise-content" label="User to Revise Content" default-group="-app" >
 			<actions>
 				<action identifier="user-editing-and-sending-back-to-approver" label="Edit and Send Back for Review" next-id="publish-to-staging" />
@@ -157,6 +152,11 @@
 						</parameter>
 					</trigger>
 				</action>
+			</actions>
+		</step>
+		<step type="edit" identifier="tech-to-revise-content" label="Technical Reviewer to Revise Content" default-group="developers" >
+			<actions>
+				<action identifier="tech-reviewer-editing-then-publishing" label="Edit then Publish" next-id="publish" />
 			</actions>
 		</step>
 	</non-ordered-steps>

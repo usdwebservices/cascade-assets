@@ -1,4 +1,4 @@
-<system-workflow-definition name="Delete" initial-step="delete-page" >
+<system-workflow-definition initial-step="delete-page" >
 	<triggers>
 		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
 		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />

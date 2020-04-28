@@ -1,9 +1,9 @@
-<system-workflow-definition name="Edit by Contributor" initial-step="edit" >
+<system-workflow-definition initial-step="edit-start" >
 	<triggers>
 		<trigger name="com.cms.workflow.function.AssignStepIfUser" class="com.cms.workflow.function.AssignStepIfUser" />
 		<trigger name="com.cms.workflow.function.AssignToGroupOwningAsset" class="com.cms.workflow.function.AssignToGroupOwningAsset" />
 		<trigger name="com.cms.workflow.function.AssignToSpecifiedGroup" class="com.cms.workflow.function.AssignToSpecifiedGroup" />
-		<trigger name="com.cms.workflow.function.AssignToWorkflowOwner" class="com.cms.workflow.function.AssignToWorkflowOwner" />
+		<trigger name="assignToWorkflowOwner" class="com.cms.workflow.function.AssignToWorkflowOwner" />
 		<trigger name="com.cms.workflow.function.CopyFolder" class="com.cms.workflow.function.CopyFolder" />
 		<trigger name="com.cms.workflow.function.CreateNewWorkflowTrigger" class="com.cms.workflow.function.CreateNewWorkflowTrigger" />
 		<trigger name="com.cms.workflow.function.Delete" class="com.cms.workflow.function.Delete" />
@@ -11,7 +11,7 @@
 		<trigger name="com.cms.workflow.function.DeleteParentFolderTrigger" class="com.cms.workflow.function.DeleteParentFolderTrigger" />
 		<trigger name="email" class="com.cms.workflow.function.EmailProvider" />
 		<trigger name="merge" class="com.cms.workflow.function.Merge" />
-		<trigger name="com.cms.workflow.function.PreserveCurrentUser" class="com.cms.workflow.function.PreserveCurrentUser" />
+		<trigger name="preserveCurrentUser" class="com.cms.workflow.function.PreserveCurrentUser" />
 		<trigger name="com.cms.workflow.function.PublishContainingPublishSetTrigger" class="com.cms.workflow.function.PublishContainingPublishSetTrigger" />
 		<trigger name="com.cms.workflow.function.PublishParentFolderTrigger" class="com.cms.workflow.function.PublishParentFolderTrigger" />
 		<trigger name="com.cms.workflow.function.PublishSetTrigger" class="com.cms.workflow.function.PublishSetTrigger" />
@@ -19,7 +19,7 @@
 		<trigger name="version" class="com.cms.workflow.function.Version" />
 	</triggers>
 	<steps>
-		<step type="system" identifier="edit" label="Edit" >
+		<step type="system" identifier="edit-start" label="Edit" >
 			<actions>
 				<action identifier="editing" label="Editing" move="forward" >
 					<trigger name="email" >
@@ -33,10 +33,8 @@
 		</step>
 		<step type="transition" identifier="content-review" label="Content Review" default-group="law-app" >
 			<actions>
-				<action identifier="approver-editing" label="Edit" next-id="approver-to-revise-content" >
-					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
-				</action>
-				<action identifier="approver-approving" label="Approve" move="forward" >
+				<action identifier="approver-assigning-modifications" label="Assign Additional Modifications" next-id="contributor-to-revise-content" >
+					<trigger name="assignToWorkflowOwner" />
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
@@ -44,8 +42,10 @@
 						</parameter>
 					</trigger>
 				</action>
-				<action identifier="approver-assigning-modifications" label="Assign Additional Modifications" next-id="contributor-to-revise-content" >
-					<trigger name="com.cms.workflow.function.AssignToWorkflowOwner" />
+				<action identifier="approver-editing" label="Edit" next-id="approver-to-revise-content" >
+					<trigger name="preserveCurrentUser" />
+				</action>
+				<action identifier="approver-approving" label="Approve" move="forward" >
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
@@ -59,7 +59,7 @@
 			<actions>
 				<action identifier="tech-reviewer-approving" label="Approve" move="forward" />
 				<action identifier="tech-reviewer-assigning-modifications" label="Assign Additional Modifications" next-id="contributor-to-revise-content" >
-					<trigger name="com.cms.workflow.function.AssignToWorkflowOwner" />
+					<trigger name="assignToWorkflowOwner" />
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
@@ -68,7 +68,7 @@
 					</trigger>
 				</action>
 				<action identifier="tech-reviewer-editing" label="Edit" next-id="tech-to-revise-content" >
-					<trigger name="com.cms.workflow.function.PreserveCurrentUser" />
+					<trigger name="preserveCurrentUser" />
 				</action>
 			</actions>
 		</step>
@@ -80,14 +80,9 @@
 					<trigger name="publish" >
 						<parameter>
 							<name>authorizing-type</name>
-							<value>user</value>
-						</parameter>
-						<parameter>
-							<name>authorizing-user</name>
-							<value>_admin</value>
+							<value>system</value>
 						</parameter>
 					</trigger>
-					<trigger name="com.cms.workflow.function.Version" />
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
@@ -100,9 +95,9 @@
 		<step type="system" identifier="complete" label="Complete" />
 	</steps>
 	<non-ordered-steps>
-		<step type="edit" identifier="approver-to-revise-content" label="Approver to Revise Content" default-group="law-app" >
+		<step type="edit" identifier="contributor-to-revise-content" label="Contributor to Revise Content" default-group="law-tech" >
 			<actions>
-				<action identifier="approver-editing-then-sending-to-tech-review" label="Edit then Send to Tech Review" next-id="technical-review" >
+				<action identifier="contributor-editing-and-sending-back-to-approver" label="Edit and Send Back for Review" next-id="content-review" >
 					<trigger name="email" >
 						<parameter>
 							<name>mode</name>
@@ -117,10 +112,15 @@
 				<action identifier="tech-reviewer-editing-then-publishing" label="Edit then Publish" next-id="publish" />
 			</actions>
 		</step>
-		<step type="edit" identifier="contributor-to-revise-content" label="Contributor to Revise Content" default-group="law-tech" >
+		<step type="edit" identifier="approver-to-revise-content" label="Approver to Revise Content" default-group="law-app" >
 			<actions>
-				<action identifier="contributor-editing-and-sending-back-to-approver" label="Edit and Send Back for Review" next-id="edit" >
-					<trigger name="com.cms.workflow.function.AssignToWorkflowOwner" />
+				<action identifier="approver-editing-then-sending-to-tech-review" label="Edit then Send to Tech Review" next-id="technical-review" >
+					<trigger name="email" >
+						<parameter>
+							<name>mode</name>
+							<value>notify</value>
+						</parameter>
+					</trigger>
 				</action>
 			</actions>
 		</step>

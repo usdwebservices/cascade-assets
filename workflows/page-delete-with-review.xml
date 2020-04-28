@@ -26,7 +26,7 @@
 				</action>
 			</actions>
 		</step>
-		<step type="transition" identifier="final-review" label="Final Review (Approver)" default-group="law-app" >
+		<step type="transition" identifier="final-review" label="Final Review (Approver)" default-group="law-tech" >
 			<actions>
 				<action identifier="cancel" label="Cancel" next-id="cancelled" />
 				<action identifier="approve" label="Approve" move="forward" >
